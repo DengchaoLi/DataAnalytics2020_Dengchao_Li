@@ -48,3 +48,20 @@ x<-seq(0,100,1)
 qqplot(qt(ppoints(250), df = 5), x, xlab = "Q-Q plot for t 
 + + dsn")
 qqline(x)
+
+data<-read.csv('/Users/lidengchao/Desktop/DA/GPW3_GRUMP_SummaryInformation_2010.csv')
+PPU <- data$Resolution
+summary(PPU)
+fivenum(PPU ,na.rm=TRUE)
+stem(PPU)
+hist(PPU)
+hist(PPU, seq(0, 390, 1.0), prob=TRUE)
+lines(density(PPU,na.rm=TRUE,bw=1.))
+ rug(PPU )
+plot(ecdf(PPU), do.points=FALSE, verticals=TRUE)
+par(pty="s")
+ qqnorm(PPU); qqline(PPU)
+x<-seq(0,390,1)
+qqplot(qt(ppoints(250), df = 5), x, xlab = "Q-Q plot for t 
++ + dsn")
+qqline(x)
