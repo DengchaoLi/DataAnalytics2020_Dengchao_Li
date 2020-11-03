@@ -1,0 +1,238 @@
+Lab3
+
+install.packages('ggplot2')
+> library(ggplot2)
+> data(msleep)
+
+> install.packages("rpart.plot")
+> library(rpart)
+> library(rpart.plot)
+> str(msleep)
+Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	83 obs. of  11 variables:
+ $ name        : chr  "Cheetah" "Owl monkey" "Mountain beaver" "Greater short-tailed shrew" ...
+ $ genus       : chr  "Acinonyx" "Aotus" "Aplodontia" "Blarina" ...
+ $ vore        : chr  "carni" "omni" "herbi" "omni" ...
+ $ order       : chr  "Carnivora" "Primates" "Rodentia" "Soricomorpha" ...
+ $ conservation: chr  "lc" NA "nt" "lc" ...
+ $ sleep_total : num  12.1 17 14.4 14.9 4 14.4 8.7 7 10.1 3 ...
+ $ sleep_rem   : num  NA 1.8 2.4 2.3 0.7 2.2 1.4 NA 2.9 NA ...
+ $ sleep_cycle : num  NA NA NA 0.133 0.667 ...
+ $ awake       : num  11.9 7 9.6 9.1 20 9.6 15.3 17 13.9 21 ...
+ $ brainwt     : num  NA 0.0155 NA 0.00029 0.423 NA NA NA 0.07 0.0982 ...
+ $ bodywt      : num  50 0.48 1.35 0.019 600 ...
+
+> str(data)
+function (..., list = character(), package = NULL, lib.loc = NULL, verbose = getOption("verbose"), envir = .GlobalEnv, overwrite = TRUE)  
+> 
+
+> mSleepDF1 <- msleep[,c(3,6,10,11)] # 3 = vore ,6=sleep_total, 10=brainwt, 11=bodywt
+> str(mSleepDF1)
+Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	83 obs. of  4 variables:
+ $ vore       : chr  "carni" "omni" "herbi" "omni" ...
+ $ sleep_total: num  12.1 17 14.4 14.9 4 14.4 8.7 7 10.1 3 ...
+ $ brainwt    : num  NA 0.0155 NA 0.00029 0.423 NA NA NA 0.07 0.0982 ...
+ $ bodywt     : num  50 0.48 1.35 0.019 600 ...
+
+> head(mSleepDF1)
+   vore sleep_total brainwt  bodywt
+1 carni        12.1      NA  50.000
+2  omni        17.0 0.01550   0.480
+3 herbi        14.4      NA   1.350
+4  omni        14.9 0.00029   0.019
+5 herbi         4.0 0.42300 600.000
+6 herbi        14.4      NA   3.850
+> 
+> sleepModel_1 <- rpart(sleep_total ~ ., data=mSleepDF1, method = "anova")
+> sleepModel_1
+n= 83 
+
+node), split, n, deviance, yval
+      * denotes terminal node
+
+ 1) root 83 1624.066000 10.433730  
+   2) bodywt>=167.947 9    7.868889  3.488889 *
+   3) bodywt< 167.947 74 1129.325000 11.278380  
+     6) bodywt>=1.85 31  458.593500  9.361290  
+      12) vore=herbi 7   88.337140  6.642857 *
+      13) vore=carni,insecti,omni 24  303.439600 10.154170  
+        26) brainwt>=0.136 13  128.669200  9.392308 *
+        27) brainwt< 0.136 11  158.307300 11.054550 *
+     7) bodywt< 1.85 43  474.662800 12.660470  
+      14) vore=omni 13  141.370800 11.638460 *
+      15) vore=carni,herbi,insecti 30  313.829700 13.103330 *
+> 
+> rpart.plot(sleepModel_1, type = 3, fallen.leaves = TRUE)
+> rpart.plot(sleepModel_1, type = 3,digits = 3, fallen.leaves = TRUE)
+> rpart.plot(sleepModel_1, type = 3,digits = 4, fallen.leaves = TRUE)
+> 
+
+
+
+> install.packages("C50")
+data("iris")
+> head(iris)
+  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+6          5.4         3.9          1.7         0.4  setosa
+> str(iris)
+'data.frame':	150 obs. of  5 variables:
+ $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+ $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+> table(iris$Species)
+
+    setosa versicolor  virginica 
+        50         50         50 
+> set.seed(9850)
+> grn <-runif(nrow(iris))
+> 
+> irisrand <-iris[order(grn),]
+> 
+> str(irisrand)
+'data.frame':	150 obs. of  5 variables:
+ $ Sepal.Length: num  7.1 5.1 6 5.4 5.8 6.9 7.7 5.5 5.7 4.4 ...
+ $ Sepal.Width : num  3 3.8 2.2 3.9 2.7 3.1 3.8 2.6 2.6 3.2 ...
+ $ Petal.Length: num  5.9 1.5 4 1.3 3.9 4.9 6.7 4.4 3.5 1.3 ...
+ $ Petal.Width : num  2.1 0.3 1 0.4 1.2 1.5 2.2 1.2 1 0.2 ...
+ $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 3 1 2 1 2 2 3 2 2 1 ...
+> classificationmodel1 <-C5.0(irisrand[1:100,-5], irisrand[1:100,5])
+> classificationmodel1
+
+Call:
+C5.0.default(x = irisrand[1:100, -5], y = irisrand[1:100, 5])
+
+Classification Tree
+Number of samples: 100 
+Number of predictors: 4 
+
+Tree size: 4 
+
+Non-standard options: attempt to group attributes
+
+> summary(classificationmodel1)
+
+Call:
+C5.0.default(x = irisrand[1:100, -5], y = irisrand[1:100, 5])
+
+
+C5.0 [Release 2.07 GPL Edition]  	Fri Oct 30 23:26:47 2020
+-------------------------------
+
+Class specified by attribute `outcome'
+
+Read 100 cases (5 attributes) from undefined.data
+
+Decision tree:
+
+Petal.Length <= 1.9: setosa (34)
+Petal.Length > 1.9:
+:...Petal.Width > 1.6: virginica (29)
+    Petal.Width <= 1.6:
+    :...Petal.Length <= 4.9: versicolor (35)
+        Petal.Length > 4.9: virginica (2)
+
+
+Evaluation on training data (100 cases):
+
+	    Decision Tree   
+	  ----------------  
+	  Size      Errors  
+
+	     4    0( 0.0%)   <<
+
+
+	   (a)   (b)   (c)    <-classified as
+	  ----  ----  ----
+	    34                (a): class setosa
+	          35          (b): class versicolor
+	                31    (c): class virginica
+
+
+	Attribute usage:
+
+	100.00%	Petal.Length
+	 66.00%	Petal.Width
+
+
+Time: 0.0 secs
+
+> prediction1 <- predict(classificationmodel1,irisrand[101:150,])
+> prediction1
+ [1] virginica  setosa     versicolor virginica  versicolor setosa     setosa    
+ [8] versicolor versicolor versicolor versicolor virginica  virginica  setosa    
+[15] versicolor virginica  virginica  virginica  versicolor virginica  setosa    
+[22] virginica  virginica  setosa     virginica  setosa     setosa     versicolor
+[29] setosa     versicolor setosa     virginica  virginica  virginica  setosa    
+[36] virginica  versicolor virginica  setosa     setosa     virginica  setosa    
+[43] virginica  virginica  virginica  setosa     virginica  virginica  versicolor
+[50] setosa    
+Levels: setosa versicolor virginica
+> table(irisrand[101:150,5],prediction1)
+            prediction1
+             setosa versicolor virginica
+  setosa         16          0         0
+  versicolor      0         12         3
+  virginica       0          0        19
+> plot(classificationmodel1)
+
+> install.packages("e1071")
+> library("e1071")
+> classifier<-naiveBayes(iris[,1:4], iris[,5])
+> 
+> table(predict(classifier, iris[,-5]), iris[,5], dnn=list('predicted','actual'))
+            actual
+predicted    setosa versicolor virginica
+  setosa         50          0         0
+  versicolor      0         47         3
+  virginica       0          3        47
+> classifier$apriori
+iris[, 5]
+    setosa versicolor  virginica 
+        50         50         50 
+> 
+> classifier$tables$Petal.Length
+            Petal.Length
+iris[, 5]     [,1]      [,2]
+  setosa     1.462 0.1736640
+  versicolor 4.260 0.4699110
+  virginica  5.552 0.5518947
+> plot(function(x) dnorm(x, 1.462, 0.1736640), 0, 8, col="red", main="Petal length distribution for the 3 different species")
+> 
+> curve(dnorm(x, 4.260, 0.4699110), add=TRUE, col="blue")
+> 
+> curve(dnorm(x, 5.552, 0.5518947 ), add=TRUE, col = "green") 
+> 
+
+
+Ctree1
+
+install.packages("rpart.plot")
+> library(rpart)
+> require(rpart)
+> Swiss_rpart <- rpart(Fertility ~ Agriculture + Education + Catholic, data = swiss)
+> plot(swiss_rpart)
+Error in plot(swiss_rpart) : 找不到对象'swiss_rpart'
+> plot(Swiss_rpart)
+> text(Swiss_rpart)
+
+
+Ctree 2
+install.packages("party")
+> library("party")
+fit2M <- ctree(Mileage~Price + Country + Reliability + Type, data=na.omit(cu.summary))
+> summary(fit2M)
+    Length      Class       Mode 
+         1 BinaryTree         S4 
+> plot(fit2M, uniform=TRUE, main="CI Tree Tree for Mileage ")
+> text(fit2M, use.n=TRUE, all=TRUE, cex=.8)
+
+Ctree3
+fitK <- ctree(Kyphosis ~ Age + Number + Start, data=kyphosis)
+plot(fitK, main="Conditional Inference Tree for Kyphosis”)
+plot(fitK, main="Conditional Inference Tree for Kyphosis",type="simple")
