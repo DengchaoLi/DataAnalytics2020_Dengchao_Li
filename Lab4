@@ -1,0 +1,231 @@
+set.seed(12345)
+> help(par)
+> 
+> par(mar = rep(0.2,4))
+> data_Matrix <-matrix(rnorm(400), nrow = 40)
+> image(1:10, 1:40, t(data_Matrix)[,nrow(data_Matrix):1])
+> 
+> par(mar=rep(0.2,4))
+> heatmap(data_Matrix)
+> set.seed(678910)
+> for(i in 1:40){
++     coin_Flip <- rbinom(1, size = 1, prob = 0.5)
++     if(coin_Flip){
++         data_Matrix[i, ] <- data_Matrix[i, ] + rep(c(0,3), each =5)
++     }
++ }
+> 
+> par(mar= rep(0.2, 4))
+> image(1:10, 1:40, t(data_Matrix)[, nrow(data_Matrix):1])
+> 
+> par(mar=rep(0.2, 4))
+> heatmap(data_Matrix)
+> hh<-hclust(dist(data_Matrix))
+> data_Matrix_Ordered<-data_Matrix[hh$order,]
+> par(mfrow = c(1,3))
+> image(t(data_Matrix_Ordered)[,nrow(data_Matrix_Ordered):1])
+> plot(rowMeans(data_Matrix_Ordered),40:1,xlab="The Row Mean",ylab="Row",pch=19)
+> plot(colMeans(data_Matrix_Ordered),xlab="Column",ylab="Column Mean",pch=19)
+
+
+Lab1_kknn1
+> install.packages("kknn")
+> library("kknn")
+> require(kknn)
+> data(iris)
+> m <- dim(iris)[1]
+> val <- sample(1:m, size = round(m/3), replace = FALSE, 
++ 	prob = rep(1/m, m)) 
+> iris.learn <- iris[-val,]
+> iris.valid <- iris[val,]
+> iris.kknn <- kknn(Species~., iris.learn, iris.valid, distance = 1,
++ 	kernel = "triangular")
+> summary(iris.kknn)
+
+Call:
+kknn(formula = Species ~ ., train = iris.learn, test = iris.valid,     distance = 1, kernel = "triangular")
+
+Response: "nominal"
+          fit prob.setosa prob.versicolor prob.virginica
+1      setosa           1      0.00000000    0.000000000
+2   virginica           0      0.21072567    0.789274331
+3  versicolor           0      1.00000000    0.000000000
+4      setosa           1      0.00000000    0.000000000
+5      setosa           1      0.00000000    0.000000000
+6  versicolor           0      1.00000000    0.000000000
+7   virginica           0      0.00000000    1.000000000
+8      setosa           1      0.00000000    0.000000000
+9      setosa           1      0.00000000    0.000000000
+10     setosa           1      0.00000000    0.000000000
+11     setosa           1      0.00000000    0.000000000
+12  virginica           0      0.00000000    1.000000000
+13 versicolor           0      1.00000000    0.000000000
+14     setosa           1      0.00000000    0.000000000
+15  virginica           0      0.00000000    1.000000000
+16  virginica           0      0.21605643    0.783943568
+17 versicolor           0      1.00000000    0.000000000
+18  virginica           0      0.07815287    0.921847135
+19  virginica           0      0.03775535    0.962244647
+20 versicolor           0      1.00000000    0.000000000
+21     setosa           1      0.00000000    0.000000000
+22 versicolor           0      0.78338289    0.216617107
+23 versicolor           0      1.00000000    0.000000000
+24 versicolor           0      1.00000000    0.000000000
+25 versicolor           0      1.00000000    0.000000000
+26  virginica           0      0.00000000    1.000000000
+27 versicolor           0      0.99692921    0.003070789
+28 versicolor           0      1.00000000    0.000000000
+29  virginica           0      0.00000000    1.000000000
+30     setosa           1      0.00000000    0.000000000
+31 versicolor           0      1.00000000    0.000000000
+32     setosa           1      0.00000000    0.000000000
+33     setosa           1      0.00000000    0.000000000
+34 versicolor           0      1.00000000    0.000000000
+35  virginica           0      0.00000000    1.000000000
+36     setosa           1      0.00000000    0.000000000
+37     setosa           1      0.00000000    0.000000000
+38     setosa           1      0.00000000    0.000000000
+39     setosa           1      0.00000000    0.000000000
+40     setosa           1      0.00000000    0.000000000
+41     setosa           1      0.00000000    0.000000000
+42 versicolor           0      1.00000000    0.000000000
+43  virginica           0      0.29192797    0.708072030
+44     setosa           1      0.00000000    0.000000000
+45     setosa           1      0.00000000    0.000000000
+46     setosa           1      0.00000000    0.000000000
+47 versicolor           0      1.00000000    0.000000000
+48 versicolor           0      0.71123927    0.288760733
+49 versicolor           0      0.80267747    0.197322532
+50  virginica           0      0.30222425    0.697775753
+> fit <- fitted(iris.kknn)
+> table(iris.valid$Species, fit)
+            fit
+             setosa versicolor virginica
+  setosa         21          0         0
+  versicolor      0         15         2
+  virginica       0          2        10
+> pcol <- as.character(as.numeric(iris.valid$Species))
+> pairs(iris.valid[1:4], pch = pcol, col = c("green3", "red”)[(iris.valid$Species != fit)+1])
+
+
+
+Kknn2
+> require(kknn)
+> data(ionosphere)
+> ionosphere.learn <- ionosphere[1:200,]
+> ionosphere.valid <- ionosphere[-c(1:200),]
+> fit.kknn <- kknn(class ~ ., ionosphere.learn, ionosphere.valid)
+> table(ionosphere.valid$class, fit.kknn$fit)
+   
+      b   g
+  b  19   8
+  g   2 122
+> (fit.train1 <- train.kknn(class ~ ., ionosphere.learn, kmax = 15, 
++ 	kernel = c("triangular", "rectangular", "epanechnikov", "optimal"), distance = 1))
+
+Call:
+train.kknn(formula = class ~ ., data = ionosphere.learn, kmax = 15,     distance = 1, kernel = c("triangular", "rectangular", "epanechnikov",         "optimal"))
+
+Type of response variable: nominal
+Minimal misclassification: 0.12
+Best kernel: rectangular
+Best k: 2
+> table(predict(fit.train1, ionosphere.valid), ionosphere.valid$class)
+   
+      b   g
+  b  25   4
+  g   2 120
+> (fit.train2 <- train.kknn(class ~ ., ionosphere.learn, kmax = 15, 
++ 	kernel = c("triangular", "rectangular", "epanechnikov", "optimal"), distance = 2))
+
+Call:
+train.kknn(formula = class ~ ., data = ionosphere.learn, kmax = 15,     distance = 2, kernel = c("triangular", "rectangular", "epanechnikov",         "optimal"))
+
+Type of response variable: nominal
+Minimal misclassification: 0.12
+Best kernel: rectangular
+Best k: 2
+> table(predict(fit.train2, ionosphere.valid), ionosphere.valid$class)
+   
+      b   g
+  b  20   5
+  g   7 119
+
+Kknn3
+
+> data(swiss)
+> pairs(~ Fertility + Education + Catholic, data = swiss, subset = Education < 20, main = "Swiss data, Education < 20")
+
+Kmeans1
+> data(swiss)
+> sclass <- kmeans(swiss[2:6], 3) 
+> table(sclass$cluster, swiss[,1])    
+   
+    35 42.8 44.7 54.3 55.7 56.6 57.4 58.3 60.5 61.7 64.1 64.4 65 65.1 65.4 65.5
+  1  0    0    0    0    0    1    1    0    1    1    1    0  1    1    1    1
+  2  1    1    1    1    1    0    0    1    0    0    0    1  0    0    0    0
+  3  0    0    0    0    0    0    0    0    0    0    0    0  1    0    0    0
+   
+    65.7 66.9 67.6 68.3 68.9 69.3 70.4 70.5 71.7 72 72.5 72.7 74.2 75.5 76.1 76.9
+  1    0    1    0    1    1    0    1    0    1  1    1    0    1    0    0    1
+  2    1    0    1    0    0    0    0    0    0  0    0    1    0    0    0    0
+  3    0    0    0    0    0    1    0    1    0  0    0    0    0    1    1    0
+   
+    77.3 77.6 79.3 79.4 80.2 82.4 82.9 83.1 83.8 85.8 87.1 92.2 92.4 92.5
+  1    0    1    0    0    0    0    0    0    0    0    0    0    0    0
+  2    0    0    0    0    1    0    0    0    0    1    0    0    0    0
+  3    1    0    1    1    0    1    1    1    1    0    1    1    1    1
+
+
+Lab1_nyt
+nyt1<-read.csv("/Users/lidengchao/Desktop/nyt1.csv")
+> nyt1<-nyt1[which(nyt1$Impressions>0 & nyt1$Clicks>0 & nyt1$Age>0),]
+> nnyt1<-dim(nyt1)[1]		# shrink it down!
+> sampling.rate=0.9
+> num.test.set.labels=nnyt1*(1.-sampling.rate)
+> training <-sample(1:nnyt1,sampling.rate*nnyt1, replace=FALSE)
+> train<-subset(nyt1[training,],select=c(Age,Impressions))
+> testing<-setdiff(1:nnyt1,training)
+> test<-subset(nyt1[testing,],select=c(Age,Impressions))
+> cg<-nyt1$Gender[training]
+> true.labels<-nyt1$Gender[testing]
+> library('class')
+> classif<-knn(train,test,cg,k=5)
+> classif
+   [1] 1 1 1 1 1 1 0 0 1 0 0 1 1 1 0 1 0 0 0 0 0 1 0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 0
+  [39] 0 1 1 1 0 1 1 1 1 1 0 1 1 0 0 1 0 0 0 0 1 0 1 1 1 0 0 1 1 0 0 1 1 0 1 0 1 0
+  [77] 1 1 0 0 1 1 0 0 1 0 0 0 0 0 0 0 0 1 0 1 1 1 0 0 0 0 0 0 1 1 1 1 1 0 0 1 1 1
+ [115] 1 0 1 0 0 1 1 0 0 1 1 1 1 1 1 0 0 0 1 1 1 0 0 0 0 0 1 1 1 1 1 0 0 1 1 1 1 0
+ [153] 1 0 1 1 1 1 1 1 1 1 0 1 1 0 1 1 1 0 0 0 0 1 1 0 1 1 0 1 0 0 0 0 0 0 0 0 1 0
+ [191] 0 0 1 1 0 0 0 1 1 0 1 0 1 1 0 1 0 0 0 1 0 1 1 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1
+ [229] 0 0 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 0 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 0 1 1 1
+ [267] 1 1 1 1 0 0 1 0 0 1 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 1 1 0 1 1 0 1 0 1 1 1 0 0
+ [305] 0 0 1 0 1 1 0 0 1 1 0 0 0 0 1 0 1 0 0 1 1 1 0 1 0 1 0 0 0 1 0 0 1 0 1 0 0 1
+ [343] 1 0 0 1 0 0 0 0 0 0 1 1 0 0 1 1 1 0 1 1 1 1 1 0 1 1 1 1 0 1 1 1 1 0 1 0 0 0
+ [381] 1 0 1 1 1 1 0 1 1 0 1 1 0 0 0 0 0 0 1 1 1 1 0 1 1 1 0 0 0 0 1 1 1 1 1 0 1 0
+ [419] 1 1 1 0 0 0 1 0 1 1 1 1 1 1 0 0 1 0 1 1 0 1 0 1 0 1 1 1 1 0 1 0 0 0 0 1 1 0
+ [457] 0 1 1 1 0 1 0 1 1 1 1 1 0 1 0 0 0 0 0 0 1 1 1 0 1 1 1 1 0 1 0 1 1 1 0 0 1 0
+ [495] 1 1 1 1 1 1 1 1 1 1 0 1 0 0 1 0 1 0 1 0 1 0 0 0 0 0 1 1 1 1 0 1 1 0 0 1 1 0
+ [533] 1 1 0 1 1 0 1 0 0 0 1 1 1 1 0 1 1 0 1 0 0 0 0 1 0 1 1 0 1 1 0 0 1 0 1 0 1 0
+ [571] 0 1 0 1 1 1 1 1 1 1 1 1 1 0 0 0 1 1 0 0 1 1 1 1 1 0 0 1 0 0 1 0 1 1 0 0 0 1
+ [609] 1 1 0 1 0 1 0 0 0 1 1 0 1 0 1 0 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 0 1 1 0 1 1 1
+ [647] 1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 1 0 0 1 1 0 0 1 0 1 0 0 0 1 0 1 0 1
+ [685] 1 1 0 1 1 0 0 1 1 1 1 0 0 1 0 0 1 1 1 0 1 0 1 0 1 1 0 1 0 1 0 1 1 1 0 1 1 0
+ [723] 0 0 0 1 0 1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 0 0 0 0 1 1 1 1 1 1 0 1 1 1 0 0 0 0
+ [761] 0 0 1 0 1 0 0 1 0 1 1 0 0 0 0 1 0 0 1 1 0 1 1 0 1 0 1 0 1 1 0 0 1 0 0 1 0 1
+ [799] 0 1 1 0 1 1 1 1 0 1 0 1 0 0 1 0 1 1 1 1 1 0 1 1 0 1 1 0 0 1 0 0 1 1 1 0 0 1
+ [837] 0 1 0 0 1 1 0 1 1 0 1 0 1 0 0 0 1 1 1 1 0 0 0 1 0 0 1 1 1 0 1 0 1 0 1 1 1 1
+ [875] 1 0 1 1 1 1 0 1 1 0 1 1 0 1 1 0 1 1 1 0 0 0 0 1 0 1 1 1 1 0 1 1 0 0 1 0 0 1
+ [913] 1 0 0 0 0 1 1 0 1 0 1 1 0 1 1 0 1 1 1 1 0 0 1 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0
+ [951] 1 0 0 1 1 1 0 0 1 0 0 0 1 1 0 1 0 0 1 0 1 0 0 1 0 0 1 1 1 1 1 0 0 1 1 0 0 1
+ [989] 1 1 0 0 1 1 1 1 0 1 0 1
+ [ reached getOption("max.print") -- omitted 1207 entries ]
+Levels: 0 1
+> attributes(.Last.value) 
+$levels
+[1] "0" "1"
+
+$class
+[1] "factor"
+
+> 
