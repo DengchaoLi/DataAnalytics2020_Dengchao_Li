@@ -1,0 +1,124 @@
+
+> library(titanic)
+> library(rpart)
+> install.packages("rattle")
+> library(rattle)
+> install.packages("caret")
+> library(party)
+> library(randomForest)
+> install.packages("party")
+> library(randomForest)
+> titanic <- na.omit(titanic_train[,c(2,3,5:8,10)])
+> titanic$Sex <- ifelse(titanic$Sex=='male',1,0)
+> n <- nrow(titanic)
+> train_index <- sample(1:n,n*0.7)
+> train <- titanic[train_index,]
+> test <- titanic[-train_index,]
+> #-----------------------------------------1.rpart-----------------------------------------------
+> rpart <- rpart(Survived~Pclass+Sex+Age+SibSp+Parch+Fare,data=train,
++              method="class", parms=list(split="information"))#剪枝前
+> fancyRpartPlot(rpart,main='Decision Tree',sub = '')
+> tree_mat <- predict(rpart,newdata = test) 
+> tree_pre <- unique(test$Survived)[apply(tree_mat, 1, which.max)]
+> confusionMatrix(factor(tree_pre),factor(test$Survived))#混淆矩阵
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 102  26
+         1  20  67
+                                          
+               Accuracy : 0.786           
+                 95% CI : (0.7251, 0.8389)
+    No Information Rate : 0.5674          
+    P-Value [Acc > NIR] : 1.423e-11       
+                                          
+                  Kappa : 0.5608          
+                                          
+ Mcnemar's Test P-Value : 0.461           
+                                          
+            Sensitivity : 0.8361          
+            Specificity : 0.7204          
+         Pos Pred Value : 0.7969          
+         Neg Pred Value : 0.7701          
+             Prevalence : 0.5674          
+         Detection Rate : 0.4744          
+   Detection Prevalence : 0.5953          
+      Balanced Accuracy : 0.7782          
+                                          
+       'Positive' Class : 0               
+                                          
+> #-----------------------------------------2.ctree---------------------------------------------
+> ctree <- ctree(factor(Survived)~Pclass+Sex+Age+SibSp+Parch+Fare,data=train)
+> plot(ctree)
+> ctree_pre <- predict(ctree,newdata = test,type='response')
+> confusionMatrix(factor(ctree_pre),factor(test$Survived))#混淆矩阵
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 103  24
+         1  19  69
+                                          
+               Accuracy : 0.8             
+                 95% CI : (0.7402, 0.8513)
+    No Information Rate : 0.5674          
+    P-Value [Acc > NIR] : 5.61e-13        
+                                          
+                  Kappa : 0.59            
+                                          
+ Mcnemar's Test P-Value : 0.5419          
+                                          
+            Sensitivity : 0.8443          
+            Specificity : 0.7419          
+         Pos Pred Value : 0.8110          
+         Neg Pred Value : 0.7841          
+             Prevalence : 0.5674          
+         Detection Rate : 0.4791          
+   Detection Prevalence : 0.5907          
+      Balanced Accuracy : 0.7931          
+                                          
+       'Positive' Class : 0               
+                                          
+> #---------------------------------------- 3.random forest-------------------------------------
+> rf_fit <- randomForest(factor(Survived)~Pclass+Sex+Age+SibSp+Parch+Fare,data=train,ntree =500,mtry=3,
++                       importance=TRUE ,
++                       proximity=TRUE)
+> rf_fit$importance
+                 0            1 MeanDecreaseAccuracy MeanDecreaseGini
+Pclass 0.046241629 0.1181304387          0.074610687        22.464460
+Sex    0.124183957 0.2029074272          0.155051623        63.573430
+Age    0.033132107 0.0485025707          0.039248521        53.606456
+SibSp  0.027678329 0.0009766971          0.017126864        11.674005
+Parch  0.005052174 0.0071523140          0.005879088         7.187365
+Fare   0.037458324 0.0552829477          0.044440493        53.966867
+> varImpPlot(rf_fit, main = "Variable Importance")
+> rf_pre <- predict(rf_fit,newdata = test) 
+> confusionMatrix(factor(rf_pre),factor(test$Survived))
+Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 97 17
+         1 25 76
+                                          
+               Accuracy : 0.8047          
+                 95% CI : (0.7453, 0.8554)
+    No Information Rate : 0.5674          
+    P-Value [Acc > NIR] : 1.805e-13       
+                                          
+                  Kappa : 0.6061          
+                                          
+ Mcnemar's Test P-Value : 0.2801          
+                                          
+            Sensitivity : 0.7951          
+            Specificity : 0.8172          
+         Pos Pred Value : 0.8509          
+         Neg Pred Value : 0.7525          
+             Prevalence : 0.5674          
+         Detection Rate : 0.4512          
+   Detection Prevalence : 0.5302          
+      Balanced Accuracy : 0.8061          
+                                          
+       'Positive' Class : 0               
+                                          
